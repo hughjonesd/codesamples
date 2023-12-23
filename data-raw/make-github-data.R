@@ -3,6 +3,7 @@ library(gh)
 library(purrr)
 library(tibble)
 library(dplyr)
+library(stringi)
 
 save_file <- "github-r-snippets.rds"
 
@@ -52,6 +53,8 @@ while (TRUE) {
 
 save_file <- "data-raw/github-r-snippets.rds"
 github_data <- as.data.frame(readRDS(save_file))
-github_data <- filter(github_data, grepl("\\.R$", path))
+github_data <- filter(github_data,
+                      grepl("\\.R$", path),
+                      stringi::stri_enc_isascii(snippet))
 usethis::use_data(github_data, overwrite = TRUE)
 

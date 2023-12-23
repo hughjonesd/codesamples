@@ -7,7 +7,7 @@
 \format{
 \subsection{\code{github_data}}{
 
-A data frame with 10,528 rows and 4 columns:
+A data frame with 9,738 rows and 4 columns:
 \describe{
 \item{starter}{Starter for the github search}
 \item{repo}{Github repo name}
