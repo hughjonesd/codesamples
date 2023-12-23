@@ -22,6 +22,10 @@ remotes::install_github("hughjonesd/codesamples")
 
 ``` r
 library(codesamples)
+dim(github_data)
+#> [1] 9738    4
+dim(so_questions)
+#> [1] 11333     3
 
 cat(github_data$snippet[[1]])
 #> #' Extract out common by variables

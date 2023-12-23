@@ -34,6 +34,8 @@ remotes::install_github("hughjonesd/codesamples")
 
 ```{r}
 library(codesamples)
+dim(github_data)
+dim(so_questions)
 
 cat(github_data$snippet[[1]])
 
