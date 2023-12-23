@@ -1,5 +1,5 @@
 Package: codesamples
-Title: R Code Samples From Various Soruces
+Title: R Code Samples From Various Sources
 Version: 0.0.0.9000
 Authors@R: 
     person("David", "Hugh-Jones", , "davidhughjones@gmail.com", 
