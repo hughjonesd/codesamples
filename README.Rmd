@@ -1,0 +1,45 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# codesamples
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+A large database of R snippets from Stack Overflow and Github.
+
+
+## Installation
+
+You can install the development version of codesamples from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("remotes")
+remotes::install_github("hughjonesd/codesamples")
+```
+
+## Example
+
+```{r}
+library(codesamples)
+
+cat(github_data$snippet[[1]])
+
+# Not all data is guaranteed valid!
+cat(so_questions$snippet[[1]])
+
+cat(so_questions$snippet[[2]])
+
+```
