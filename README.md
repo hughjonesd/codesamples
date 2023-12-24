@@ -28,9 +28,10 @@ dim(github_data)
 dim(so_questions)
 #> [1] 11333     3
 dim(package_examples)
-#> [1] 1544    3
+#> [1] 6323    3
 
-cat(github_data$snippet[[1]])
+first_lines <- strsplit(github_data$snippet[[1]], "\n")[[1]][1:23] 
+cat(first_lines, sep = "\n")
 #> #' Extract out common by variables
 #> #'
 #> #' @export
@@ -52,59 +53,6 @@ cat(github_data$snippet[[1]])
 #>   by_x[by_x == ""] <- by_y[by_x == ""]
 #> 
 #>   list(x = by_x, y = by_y)
-#> }
-#> 
-#> #' @export
-#> common_by.list <- function(by, x, y) {
-#>   x_vars <- tbl_vars(x)
-#>   if (!all(by$x %in% x_vars)) {
-#>     msg <- glue("`by` can't contain join column {missing} which is missing from LHS.",
-#>       missing = fmt_obj(setdiff(by$x, x_vars))
-#>     )
-#>     abort(msg)
-#>   }
-#> 
-#>   y_vars <- tbl_vars(y)
-#>   if (!all(by$y %in% y_vars)) {
-#>     msg <- glue("`by` can't contain join column {missing} which is missing from RHS.",
-#>       missing = fmt_obj(setdiff(by$y, y_vars))
-#>     )
-#>     abort(msg)
-#>   }
-#> 
-#>   by
-#> }
-#> 
-#> #' @export
-#> common_by.NULL <- function(by, x, y) {
-#>   by <- intersect(tbl_vars(x), tbl_vars(y))
-#>   by <- by[!is.na(by)]
-#>   if (length(by) == 0) {
-#>     msg <- glue("`by` required, because the data sources have no common variables.")
-#>     abort(msg)
-#>   }
-#>   inform(auto_by_msg(by))
-#> 
-#>   list(
-#>     x = by,
-#>     y = by
-#>   )
-#> }
-#> 
-#> auto_by_msg <- function(by) {
-#>   by_quoted <- encodeString(by, quote = '"')
-#>   if (length(by_quoted) == 1L) {
-#>     by_code <- by_quoted
-#>   } else {
-#>     by_code <- paste0("c(", paste(by_quoted, collapse = ", "), ")")
-#>   }
-#>   paste0("Joining, by = ", by_code)
-#> }
-#> 
-#> #' @export
-#> common_by.default <- function(by, x, y) {
-#>   msg <- glue("`by` must be a (named) character vector, list, or NULL for natural joins (not recommended in production code), not {obj_type_friendly(by)}.")
-#>   abort(msg)
 #> }
 
 cat(package_examples$snippet[[1]])

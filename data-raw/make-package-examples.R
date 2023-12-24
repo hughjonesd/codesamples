@@ -5,7 +5,7 @@ library(dplyr)
 library(stringi)
 
 set.seed(10271975)
-pkgs <- sample(rownames(available.packages()), 100)
+pkgs <- sample(rownames(available.packages()), 500)
 
 tmp_lib_path <-"tmp-library"
 

@@ -75,7 +75,7 @@
 #' your machine without checking it manually first!**
 #'
 #' @format ## `package_examples`
-#' A data frame with 1,544 rows and 3 columns:
+#' A data frame with 6,323 rows and 3 columns:
 #' \describe{
 #'   \item{package}{R package}
 #'   \item{topic}{Help topic}

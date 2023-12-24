@@ -39,7 +39,8 @@ dim(github_data)
 dim(so_questions)
 dim(package_examples)
 
-cat(github_data$snippet[[1]])
+first_lines <- strsplit(github_data$snippet[[1]], "\n")[[1]][1:23] 
+cat(first_lines, sep = "\n")
 
 cat(package_examples$snippet[[1]])
 
