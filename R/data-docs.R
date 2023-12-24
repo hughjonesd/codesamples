@@ -63,3 +63,22 @@
 #'   \item{snippet}{The R code itself}
 #' }
 "so_questions"
+
+
+
+#' Stack Overflow R Snippets
+#'
+#' R examples from 100 randomly chosen packages.
+#'
+#' Unlike the other two datasets, example code *should* be
+#' reasonably safe. Still it is best to **not run any code on
+#' your machine without checking it manually first!**
+#'
+#' @format ## `package_examples`
+#' A data frame with 1,544 rows and 3 columns:
+#' \describe{
+#'   \item{package}{R package}
+#'   \item{topic}{Help topic}
+#'   \item{snippet}{The R code itself}
+#' }
+"package_examples"

@@ -6,7 +6,8 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-A large database of R snippets from Stack Overflow and Github.
+A large database of R snippets from Stack Overflow, Github and package
+examples.
 
 ## Installation
 
@@ -26,6 +27,8 @@ dim(github_data)
 #> [1] 9738    4
 dim(so_questions)
 #> [1] 11333     3
+dim(package_examples)
+#> [1] 1544    3
 
 cat(github_data$snippet[[1]])
 #> #' Extract out common by variables
@@ -103,6 +106,21 @@ cat(github_data$snippet[[1]])
 #>   msg <- glue("`by` must be a (named) character vector, list, or NULL for natural joins (not recommended in production code), not {obj_type_friendly(by)}.")
 #>   abort(msg)
 #> }
+
+cat(package_examples$snippet[[1]])
+#> ### Name: densify
+#> ### Title: Densify spatial lines or polygons
+#> ### Aliases: densify
+#> 
+#> ### ** Examples
+#> 
+#> library(sf)
+#> l <- jagged_lines$geometry[[2]]
+#> l_dense <- densify(l, n = 2)
+#> plot(l, lwd = 5)
+#> plot(l_dense, col = "red", lwd = 2, lty = 2, add = TRUE)
+#> plot(l_dense %>% st_cast("MULTIPOINT"), col = "red", pch = 19,
+#>      add = TRUE)
 
 # Not all data is guaranteed valid!
 cat(so_questions$snippet[[1]])
