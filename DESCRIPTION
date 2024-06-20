@@ -1,6 +1,6 @@
 Package: codesamples
 Title: R Code Samples From Various Sources
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: 
     person("David", "Hugh-Jones", , "davidhughjones@gmail.com", 
     role = c("aut", "cre"))
@@ -8,7 +8,7 @@ Description: Contains a database of code snippets from Github and Stack Overflow
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Depends: 
     R (>= 2.10)
 LazyData: true

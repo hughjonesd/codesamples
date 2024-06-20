@@ -56,7 +56,7 @@
 #' ```
 #'
 #' @format ## `so_questions`
-#' A data frame with 11,333 rows and 3 columns:
+#' A data frame with 11,226 rows and 3 columns:
 #' \describe{
 #'   \item{post_id}{SO post ID}
 #'   \item{creation_date}{Question creation date}
@@ -66,7 +66,7 @@
 
 
 
-#' Stack Overflow R Snippets
+#' Package examples
 #'
 #' R examples from 100 randomly chosen packages.
 #'
@@ -82,3 +82,22 @@
 #'   \item{snippet}{The R code itself}
 #' }
 "package_examples"
+
+#' A large database of R snippets from Stack Overflow, Github and package
+#' examples.
+#'
+#' `codesamples` contains three datasets:
+#' * [package_examples]
+#' * [so_questions]
+#' * [github_data]
+#'
+#' All datasets have a `snippet` column which contains the actual R code.
+#'
+#' checking it manually first!**
+#'
+#' @keywords internal
+"_PACKAGE"
+
+## usethis namespace: start
+## usethis namespace: end
+NULL

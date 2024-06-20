@@ -55,4 +55,9 @@ so_questions <- so_questions |> select(post_id = Id,
                                        creation_date = CreationDate,
                                        snippet = code)
 
+# regex to match e.g. DESCRIPTION files or simple lists of data
+not_r_code <- str_detect(so_questions$snippet,
+                         regex("^([A-Za-z0-9:\\. \\t]*\\n)+$"))
+so_questions <- so_questions[! not_r_code, ]
+
 usethis::use_data(so_questions, overwrite = TRUE)
