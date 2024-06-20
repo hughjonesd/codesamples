@@ -3,11 +3,12 @@
 \docType{data}
 \name{package_examples}
 \alias{package_examples}
-\title{Stack Overflow R Snippets}
+\title{Package examples}
 \format{
 \subsection{\code{package_examples}}{
 
-A data frame with 6,323 rows and 3 columns:
+A data frame with 6,323 rows
+and 3 columns:
 \describe{
 \item{package}{R package}
 \item{topic}{Help topic}

@@ -60,4 +60,9 @@ not_r_code <- str_detect(so_questions$snippet,
                          regex("^([A-Za-z0-9:\\. \\t]*\\n)+$"))
 so_questions <- so_questions[! not_r_code, ]
 
+# almost all of these were not R; the remainder were typically not R
+# that anyone was actually writing "in production"
+no_bracket <- str_detect(so_questions$snippet, "\\(.*\\)", negate = TRUE)
+so_questions <- so_questions[! no_bracket, ]
+
 usethis::use_data(so_questions, overwrite = TRUE)

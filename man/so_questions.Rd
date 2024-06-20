@@ -7,7 +7,8 @@
 \format{
 \subsection{\code{so_questions}}{
 
-A data frame with 11,333 rows and 3 columns:
+A data frame with 11,013 rows
+and 3 columns:
 \describe{
 \item{post_id}{SO post ID}
 \item{creation_date}{Question creation date}

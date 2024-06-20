@@ -10,7 +10,9 @@
 #' checking it manually first!**
 #'
 #' @format ## `github_data`
-#' A data frame with 9,738 rows and 4 columns:
+#' A data frame with `r prettyNum(nrow(github_data), big.mark = ",")` rows
+#' and `r ncol(github_data)` columns:
+#'
 #' \describe{
 #'   \item{starter}{Starter for the github search}
 #'   \item{repo}{Github repo name}
@@ -56,7 +58,8 @@
 #' ```
 #'
 #' @format ## `so_questions`
-#' A data frame with 11,226 rows and 3 columns:
+#' A data frame with `r prettyNum(nrow(so_questions), big.mark = ",")` rows
+#' and `r ncol(so_questions)` columns:
 #' \describe{
 #'   \item{post_id}{SO post ID}
 #'   \item{creation_date}{Question creation date}
@@ -75,7 +78,8 @@
 #' your machine without checking it manually first!**
 #'
 #' @format ## `package_examples`
-#' A data frame with 6,323 rows and 3 columns:
+#' A data frame with `r prettyNum(nrow(package_examples), big.mark = ",")` rows
+#' and `r ncol(package_examples)` columns:
 #' \describe{
 #'   \item{package}{R package}
 #'   \item{topic}{Help topic}
