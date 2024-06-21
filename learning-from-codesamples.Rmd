@@ -1,0 +1,282 @@
+---
+title: "Learning from R code samples"
+author: "David Hugh-Jones"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, echo = TRUE, include = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(codesamples)
+
+library(dplyr)
+library(ggraph)
+library(gt)
+library(igraph)
+library(purrr)
+library(stringr)
+library(tidygraph)
+library(tidyr)
+
+```
+
+# Learning from R code samples
+
+Ideas:
+
+-   Count popularity of base R functions.
+
+-   Compare some "rivals" across different setups: data.table vs. dplyr, parallel vs. future vs. alternatives, map\_\* vs \*apply.
+
+-   What library calls correlate? That's an easy one.
+
+To keep our data manageable, we'll remove all packages that are only mentioned in one snippet.
+
+```{r extract-packages, cache=TRUE}
+
+extract_packages <- function (snippets) {
+  # library(
+  # followed by an optional quote mark
+  # then the package:
+  # A letter, then letters or numbers or dots, finally a letter or number
+  # finally an optional quote mark
+  pattern <- paste0("library\\(", # library(
+                    "('|\")?",    # an optional quote mark
+                    "([A-Za-z][A-Za-z0-9\\.]+[A-Za-z0-9])", # the package
+                    "('|\")?",    # optional quote mark
+                    "\\)"         # end bracket
+                    )
+  matches <- str_match_all(snippets, pattern)
+  matches <- map(matches, \(x) x[, 3])
+  
+  return(matches)
+}
+
+
+co_packages <- so_questions |> 
+  mutate(
+    packages = extract_packages(so_questions$snippet)
+  ) |> 
+  select(post_id, packages) |> 
+  # creates one row for each unique member of the packages list-clumn
+  tidyr::unchop(packages)
+            
+```
+
+The next snippet lists the top 50 packages in the data:
+
+```{r list-top-50}
+top_used <- co_packages |> 
+  count(packages) |> 
+  arrange(desc(n)) |> 
+  mutate(
+    Rank = 1:n()
+  ) |> 
+  rename(
+    Package = packages
+  )
+
+gt(top_used[1:50, ]) |> 
+  tab_caption(
+    md("**Top 50 packages in a sample of Stackoverflow R snippets**")
+  )
+```
+
+The top 5 are not surprising. But `{plotly}` , `{raster}` and `{plyr}` make it to the top 10, which I did not necessarily expect. One possibility is that some packages are harder to use and generate a lot of SO questions. Or, since the data stretches back to 2013, some old packages get mentioned more than you might expect nowadays. Remember `{reshape2}` ?
+
+Now, we do some data cleaning to convert our data into a *co-occurrence matrix*, where each row and column represents a package, and the cell counts the number of times the two packages were together. First, we create columns of dummy variables for each snippet.
+
+```{r create-matrix}
+
+# Create columns of dummy variables:
+package_names <- unique(co_packages$packages)
+co_packages[, package_names] <- FALSE
+walk(package_names, \(nm) {co_packages[nm] <<- co_packages$packages == nm})
+
+# Add up the co-occurrences:
+co_packages <- summarize(co_packages, 
+                         .by = post_id,
+                         # return TRUE if any row has TRUE for the package
+                          across(any_of(package_names), any))
+
+# Make it a matrix
+co_package_mx <- co_packages |> 
+  select(-post_id) |> 
+  as.matrix()
+
+```
+
+To keep our data manageable, we'll ignore any packages which are only mentioned in one post. We aren't going to learn much from those anyway.
+
+```{r remove-singletons}
+
+mentioned_once <- colSums(co_package_mx) <= 1
+co_package_mx <- co_package_mx[, ! mentioned_once]
+```
+
+Now we can create the co-occurrence matrix.
+
+```{r create-package-graph, cache=TRUE, autodep=TRUE}
+
+package_names <- colnames(co_package_mx)
+
+n_packages <- length(package_names)
+co_package_graph <- matrix(NA_integer_, nrow = n_packages, 
+                           ncol = n_packages)
+rownames(co_package_graph) <- colnames(co_package_graph) <- package_names
+
+# Diagonal elements are the *total* number of times a package is 
+# used
+for (pkg in package_names) {
+  in_post <- co_package_mx[, pkg]
+  posts_with_pkg <- co_package_mx[in_post, , drop = FALSE] 
+  pkgs_with_pkg <- colSums(posts_with_pkg) 
+  co_package_graph[pkg, ] <- pkgs_with_pkg
+}
+
+```
+
+We'll also remove any packages that only appear on their own.
+
+```{r remove-singletons-again}
+loners <- colSums(co_package_graph > 0) == 1
+co_package_graph <- co_package_graph[! loners, ! loners]
+package_names <- rownames(co_package_graph)
+```
+
+Now we can start to play with the co-occurrence network.
+
+```{r}
+ig1 <- igraph::graph_from_adjacency_matrix(co_package_graph, 
+                                           mode = "undirected",
+                                           weighted = TRUE)
+ig1 <- tidygraph::as_tbl_graph(ig1)
+
+ig1 <- ig1 |> 
+  activate(edges) |> 
+  group_by(from) |> 
+  mutate(
+    orig_weight = weight,
+    own_n = weight[from == to],
+    weight = weight/sqrt(own_n),
+  ) |> 
+  group_by(to) |> 
+  mutate(
+    own_n = orig_weight[from == to],
+    weight = weight/sqrt(own_n),
+    orig_weight = NULL
+  ) |> 
+  ungroup() |> 
+  mutate(
+    weight = ifelse(from == to, 0, weight)
+  )
+
+# ig1 <- ig1 |> filter(weight > 0.1)
+
+clust <- cluster_walktrap(ig1, steps = 2)
+
+table(sizes(clust))
+
+ig1 <- ig1 |> 
+  activate(nodes) |> 
+  mutate(
+    community = factor(membership(clust))
+  ) |> 
+  group_by(community) |> 
+  mutate(
+    n_members = n()
+  ) |> 
+  ungroup() # ungrouping works around a bug in tidygraph 1.3.1
+
+ig1 <- ig1 |> 
+  filter(
+    n_members > 1
+  )
+
+ig1 |> 
+  filter(n_members >= 30) |> 
+  ggraph() +  
+    geom_edge_link(alpha = .5, colour = "grey70") +
+    geom_node_label(aes(label = name, fill = community), size = 3) + 
+    theme(legend.position = "none")
+```
+
+```{r find-sig-assocs, cache=TRUE, autodep=TRUE, warning=FALSE}
+
+
+cooccurrences <- rowSums(co_package_graph) - diag(co_package_graph)
+
+top_pkg_graph <- co_package_graph[cooccurrences > 0, cooccurrences > 0]
+
+n_posts <- length(unique(so_questions$post_id))
+top_pkg <- rownames(top_pkg_graph)
+
+top_pkg_pvals <- matrix(NA_real_, nrow(top_pkg_graph), ncol(top_pkg_graph))
+rownames(top_pkg_pvals) <- colnames(top_pkg_pvals) <- top_pkg
+
+suppressWarnings({
+  for (pkg1 in top_pkg) for (pkg2 in top_pkg) {
+    if (pkg1 >= pkg2) next
+    n_together <- top_pkg_graph[pkg1, pkg2]
+    n_pkg1 <- top_pkg_graph[pkg1, pkg1]
+    n_pkg2 <- top_pkg_graph[pkg2, pkg2]
+    # matrix of counts for pkg1 present/absent, pkg2 present/absent
+    chisq_tbl <- matrix(
+      c(n_together, n_pkg1 - n_together, 
+        n_pkg2 - n_together, n_posts - n_pkg1 - n_pkg2), 2, 2)
+    test <- chisq.test(chisq_tbl)
+    top_pkg_pvals[pkg1, pkg2] <- test$p.value
+  }
+})
+
+# Bonferroni-corrected
+sig <- top_pkg_pvals < 0.05/length(top_pkg_pvals)
+sig <- which(sig, arr.ind = TRUE) 
+sig_assocs <- as_tibble(sig)
+sig_assocs$pkg1 <- top_pkg[sig_assocs$row]
+sig_assocs$pkg2 <- top_pkg[sig_assocs$col]
+# the magic of matrix-based indexing
+sig_assocs$p.value <- top_pkg_pvals[sig]
+
+sig_assocs <- sig_assocs |> 
+  select(pkg1, pkg2, p.value) |> 
+  filter(pkg1 < pkg2) # get rid of duplicates using alphabetic order
+
+sig_assocs |> 
+  arrange(p.value) |> 
+  select(Package = pkg1, Friend = pkg2) |> 
+  slice_head(n = 50) |> 
+  gt::gt() |> 
+  gt::tab_caption("Significantly associated pairs of packages")
+```
+
+By keeping only clear associations, we've made the `sig_assocs` data frame a manageable size. This means we can start to play with network analysis.
+
+```{r}
+
+ig <- igraph::graph_from_data_frame(sig_assocs, directed = FALSE)
+ig <- tidygraph::as_tbl_graph(ig)
+
+cll <- igraph::cluster_walktrap(ig)
+ig <- ig |> 
+  activate(nodes) |> 
+  mutate(
+    community = factor(membership(cll))
+  ) |> 
+  group_by(community) |> 
+  mutate(
+    n_members = n()
+  ) |> 
+  ungroup()
+
+ig |> 
+  filter(n_members > 10) |> 
+  ggraph(layout = "stress") +  
+    geom_edge_link(alpha = .5, colour = "grey70") +
+    geom_node_label(aes(label = name, fill = community), size = 3) + 
+    theme(legend.position = "none")
+
+```
