@@ -44,9 +44,6 @@ cat(first_lines, sep = "\n")
 
 cat(package_examples$snippet[[1]])
 
-# Not all data is guaranteed valid!
 cat(so_questions$snippet[[1]])
-
-cat(so_questions$snippet[[2]])
 
 ```

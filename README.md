@@ -26,7 +26,7 @@ library(codesamples)
 dim(github_data)
 #> [1] 9738    4
 dim(so_questions)
-#> [1] 11333     3
+#> [1] 11013     3
 dim(package_examples)
 #> [1] 6323    3
 
@@ -70,17 +70,7 @@ cat(package_examples$snippet[[1]])
 #> plot(l_dense %>% st_cast("MULTIPOINT"), col = "red", pch = 19,
 #>      add = TRUE)
 
-# Not all data is guaranteed valid!
 cat(so_questions$snippet[[1]])
-#> Package: foo
-#> Version: 0.0
-#> Title: Foo
-#> Imports:
-#>     memisc
-#> Collate:
-#>     'foo.R'
-
-cat(so_questions$snippet[[2]])
 #> dyn.load("power.dll") # dll created with gfortran -shared -fPIC -o power.dll power.f90
 #> x <- 3.0
 #> foo <- .C("square_",as.double(x),as.double(0.0))
